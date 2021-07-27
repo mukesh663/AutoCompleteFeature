@@ -7,12 +7,13 @@ import java.awt.event.ActionListener;
 import java.util.List;
 import java.awt.event.ActionEvent;
 import java.awt.Font;
+import java.awt.Insets;
+
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
-
 import javax.swing.SwingConstants;
 
 public class Gui {
@@ -23,9 +24,8 @@ public class Gui {
 		try {
 			List<String> words = obj.getTerms();
 			trie = new Trie(words);
-		} catch (IOException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 	
@@ -98,8 +98,7 @@ public class Gui {
 				try {
 					textArea.setText(obj.getInfo(text));
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					textArea.setText("Page not found (404)");
 				}
 			}
 		});
@@ -110,6 +109,7 @@ public class Gui {
 		textArea.setFont(new Font("Open Sans", Font.PLAIN, 13));
 		textArea.setBounds(23, 175, 390, 166);
 		textArea.setEditable(false);
+		textArea.setMargin(new Insets(10,10,10,10));
 		textArea.setLineWrap(true);
 		
 		scrollPane = new JScrollPane(textArea);
@@ -122,6 +122,7 @@ public class Gui {
 		textArea_1.setColumns(5);
 		textArea_1.setFont(new Font("Open Sans Semibold", Font.PLAIN, 14));
 		textArea_1.setBounds(23, 24, 386, 28);
+		textArea_1.setMargin(new Insets(10,10,10,10));
 		textArea_1.setEditable(false);
 		
 		scrollPane_1 = new JScrollPane(textArea_1);

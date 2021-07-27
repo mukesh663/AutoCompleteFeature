@@ -18,8 +18,13 @@ class wiki {
 	
     String getInfo(String text) throws IOException {
     	Document doc = Jsoup.connect("https://en.wikipedia.org/wiki/"+text).get();
-        Elements content = doc.getElementsByTag("p");  
+        Elements content = doc.getElementsByTag("p"); 
         String info = content.get(0).text();
+        int i = 1;
+        while(info.equals("") && i< 5) {
+        	info = content.get(i).text();
+        	i++;
+        }
         return info;
     }
 }
