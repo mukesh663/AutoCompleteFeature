@@ -27,4 +27,12 @@ class wiki {
         }
         return info;
     }
+    
+    String moreInfo(String text) throws IOException {
+    	Document doc = Jsoup.connect("https://en.wikipedia.org/wiki/"+text).get();
+        Elements content = doc.getElementsByClass("mw-parser-output"); 
+        String info = content.text();
+        
+        return info;
+    }
 }

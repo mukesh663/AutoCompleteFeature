@@ -12,75 +12,104 @@ class TrieNode {
 		this.c = c;
 		children = new HashMap<>();
 	}
-	
-	void insert(String word) {
-		if (word == null || word.isEmpty())
-			return;
-		char first = word.charAt(0);
-		TrieNode child = children.get(first);
-		
-		if (child == null) {
-			child = new TrieNode(first);
-			children.put(first, child);
-		}	
-		
-		if (word.length() > 1)
-            child.insert(word.substring(1));   //Recursion
-        else
-            child.isLeaf = true;
-	}
 }
 
 public class Trie {
 	
 	TrieNode root;
 	
-	Trie(List<String> words) {               //constructor
+	Trie(List<String> words) {          //constructor
 		root = new TrieNode('\0');
-		
 		for (String word : words)
-			root.insert(word);
+			insert(word);
 	}
 	
-	public boolean find(String prefix, boolean exact) {
-        TrieNode rootNode = root;
+	protected void insert(String word) {
+		if (word == null || word.length()==0)
+			return;
+		
+		TrieNode parent = root;
+		for (char w : word.toCharArray()) {
+			TrieNode child = parent.children.get(w);
+			
+			if (child == null) {
+				child = new TrieNode(w);
+				parent.children.put(w, child);
+			}
+			parent = child;
+		}
+        
+		parent.isLeaf = true;
+	}
+	
+	public boolean find(String prefix) {
+        TrieNode lastNode = root;
         for (char c : prefix.toCharArray()) {
-            rootNode = rootNode.children.get(c);
-            if (rootNode == null)
+            lastNode = lastNode.children.get(c);
+            if (lastNode == null)
                 return false;
         }
-        return !exact || rootNode.isLeaf;
-    }
- 
-    public boolean find(String prefix) {
-        return find(prefix, false);
+        return lastNode.isLeaf;
     }
 	
-	public void suggestHelper(TrieNode root, List<String> list, StringBuffer curr) {
+	protected boolean delete(String word) {
+		if (word == null || word.length()==0)
+			return false;
+		
+		if (!find(word))
+			return false;
+		
+		TrieNode parent = root;
+		TrieNode deleteBelow = null;
+        char deleteChar = '\0';
+        
+		for (char w : word.toCharArray()) {
+			TrieNode child = parent.children.get(w);
+			if (child == null)
+				return false;
+			if (parent.children.size() > 1 || parent.isLeaf) { // Update 'deleteBelow' and 'deleteChar'
+                deleteBelow = parent;
+                deleteChar = w;
+            }
+			parent = child;
+		}
+		
+		if (!parent.isLeaf) 
+            return false;
+        
+		if (parent.children.isEmpty()) 
+            deleteBelow.children.remove(deleteChar);
+        else 
+            parent.isLeaf = false;
+		
+        return true;
+	}
+	
+	public void searcher(TrieNode root, List<String> list, StringBuffer current) {
         if (root.isLeaf) {
-            list.add(curr.toString());
+            list.add(current.toString());
         }
  
         if (root.children == null || root.children.isEmpty())
             return;
  
         for (TrieNode child : root.children.values()) {
-            suggestHelper(child, list, curr.append(child.c));
-            curr.setLength(curr.length() - 1);
+            searcher(child, list, current.append(child.c));
+            current.setLength(current.length() - 1);
         }
     }
 	
-	public List<String> suggest(String prefix) {
+	public List<String> search(String prefix) {
         List<String> list = new ArrayList<>();
         TrieNode rootNode = root;
-        StringBuffer curr = new StringBuffer();
+        StringBuffer current = new StringBuffer();
         for (char c : prefix.toCharArray()) {
             rootNode = rootNode.children.get(c);
             if (rootNode == null)
                 return list;
-            curr.append(c);
+            current.append(c);
         }
-        suggestHelper(rootNode, list, curr);
+        searcher(rootNode, list, current);
         return list;
     }
 }

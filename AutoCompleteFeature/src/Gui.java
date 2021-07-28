@@ -1,5 +1,4 @@
 import java.awt.EventQueue;
-
 import javax.swing.JFrame;
 import javax.swing.JTextField;
 import javax.swing.JButton;
@@ -8,13 +7,13 @@ import java.util.List;
 import java.awt.event.ActionEvent;
 import java.awt.Font;
 import java.awt.Insets;
-
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import javax.swing.SwingConstants;
+import javax.swing.JTextPane;
 
 public class Gui {
 
@@ -31,12 +30,15 @@ public class Gui {
 	
 	private JFrame frame;
 	private JTextField textField;
-	
     List<String> suggestions;
-    private JTextArea textArea;
     private JScrollPane scrollPane;
-    private JTextArea textArea_1;
-    private JScrollPane scrollPane_1;
+    private JTextArea textArea;
+    private JScrollPane scrollPane_2;
+    private JTextPane textPane;
+    private JButton goButton;
+    private JButton deleteButton;
+    private JButton insertButton;
+    private JButton infoButton;
     
 	/**
 	 * Launch the application.
@@ -66,70 +68,102 @@ public class Gui {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		frame = new JFrame();
-		frame.setBounds(100, 100, 450, 520);
+		frame = new JFrame("Auto Complete for Data Structure terms");
+		frame.setBounds(100, 100, 762, 630);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		
 		textField = new JTextField();
 		textField.setFont(new Font("Open Sans", Font.PLAIN, 14));
-		textField.setHorizontalAlignment(SwingConstants.CENTER);
+		textField.setHorizontalAlignment(SwingConstants.LEFT);
 		textField.addKeyListener(new KeyAdapter() {
 			public void keyReleased(KeyEvent e) {
 				String text = textField.getText().toLowerCase();
-				textArea_1.setText("");
+				textArea.setText("");
 				if (!text.equals("")) {
-					suggestions = trie.suggest(text);
+					suggestions = trie.search(text);
 					for (String s : suggestions)
-						textArea_1.setText(textArea_1.getText()+s+"\n");
+						textArea.setText(textArea.getText()+s+"\n");
 				}
 			}
 		});
-		
-		textField.setBounds(10, 127, 414, 36);
+		textField.setBounds(108, 40, 414, 36);
 		frame.getContentPane().add(textField);
 		textField.setColumns(10);
 		
-		JButton btnNewButton = new JButton("Go");
-		btnNewButton.setFont(new Font("Open Sans", Font.BOLD, 14));
-		btnNewButton.addActionListener(new ActionListener() {
+		scrollPane = new JScrollPane();
+		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		scrollPane.setBounds(108, 94, 527, 121);
+		frame.getContentPane().add(scrollPane);
+		
+		textArea = new JTextArea();
+		textArea.setEditable(false);
+		textArea.setFont(new Font("Open Sans Semibold", Font.PLAIN, 14));
+		textArea.setMargin(new Insets(10,10,10,10));
+		scrollPane.setViewportView(textArea);
+		
+		goButton = new JButton("Go");
+		goButton.setFont(new Font("Open Sans", Font.BOLD, 14));
+		goButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String text = textField.getText();
 				try {
-					textArea.setText(obj.getInfo(text));
+					textPane.setText(obj.getInfo(text));
 				} catch (IOException e1) {
-					textArea.setText("Page not found (404)");
+					textPane.setText("Page not found (404)");
 				}
 			}
 		});
-		btnNewButton.setBounds(179, 181, 74, 36);
-		frame.getContentPane().add(btnNewButton);
+		goButton.setBounds(561, 40, 74, 36);
+		frame.getContentPane().add(goButton);
 		
-		textArea = new JTextArea();
-		textArea.setFont(new Font("Open Sans", Font.PLAIN, 13));
-		textArea.setBounds(23, 175, 390, 166);
-		textArea.setEditable(false);
-		textArea.setMargin(new Insets(10,10,10,10));
-		textArea.setLineWrap(true);
+		scrollPane_2 = new JScrollPane();
+		scrollPane_2.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		scrollPane_2.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		scrollPane_2.setBounds(23, 265, 691, 297);
+		frame.getContentPane().add(scrollPane_2);
 		
-		scrollPane = new JScrollPane(textArea);
-		scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-		scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		scrollPane.setBounds(23, 239, 390, 220);
-		frame.getContentPane().add(scrollPane);
+		textPane = new JTextPane();
+		textPane.setMargin(new Insets(10,10,10,10));
+		scrollPane_2.setViewportView(textPane);
 		
-		textArea_1 = new JTextArea();
-		textArea_1.setColumns(5);
-		textArea_1.setFont(new Font("Open Sans Semibold", Font.PLAIN, 14));
-		textArea_1.setBounds(23, 24, 386, 28);
-		textArea_1.setMargin(new Insets(10,10,10,10));
-		textArea_1.setEditable(false);
+		deleteButton = new JButton("Delete");
+		deleteButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String word = textField.getText();
+				if (trie.delete(word.toLowerCase()))
+					textPane.setText(word+" deleted successfully");
+				else
+					textPane.setText(word+" not deleted or not found");
+			}
+		});
+		deleteButton.setBounds(312, 226, 105, 28);
+		frame.getContentPane().add(deleteButton);
 		
-		scrollPane_1 = new JScrollPane(textArea_1);
-		scrollPane_1.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-		scrollPane_1.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		scrollPane_1.setBounds(33, 26, 367, 72);
-		frame.getContentPane().add(scrollPane_1);
+		insertButton = new JButton("Insert");
+		insertButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String word = textField.getText();
+				trie.insert(word.toLowerCase());
+				textPane.setText(word+" added successfully");
+			}
+		});
+		insertButton.setBounds(171, 226, 96, 28);
+		frame.getContentPane().add(insertButton);
 		
+		infoButton = new JButton("More info");
+		infoButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String text = textField.getText();
+				try {
+					textPane.setText(obj.moreInfo(text));
+				} catch (IOException e1) {
+					textPane.setText("Page not found (404)");
+				}
+			}
+		});
+		infoButton.setBounds(465, 226, 96, 28);
+		frame.getContentPane().add(infoButton);
 	}
 }
