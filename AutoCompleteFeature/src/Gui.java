@@ -68,7 +68,7 @@ public class Gui {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		frame = new JFrame("Auto Complete for Data Structure terms");
+		frame = new JFrame("Auto Complete Feature");
 		frame.setBounds(100, 100, 762, 630);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
@@ -108,6 +108,8 @@ public class Gui {
 		goButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String text = textField.getText();
+				if (text.isBlank())
+					return;
 				try {
 					textPane.setText(obj.getInfo(text));
 				} catch (IOException e1) {
@@ -132,10 +134,12 @@ public class Gui {
 		deleteButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String word = textField.getText();
+				if (word.isBlank())
+					return;
 				if (trie.delete(word.toLowerCase()))
 					textPane.setText(word+" deleted successfully");
 				else
-					textPane.setText(word+" not deleted or not found");
+					textPane.setText("Not deleted or not found");
 			}
 		});
 		deleteButton.setBounds(312, 226, 105, 28);
@@ -146,7 +150,8 @@ public class Gui {
 			public void actionPerformed(ActionEvent e) {
 				String word = textField.getText();
 				trie.insert(word.toLowerCase());
-				textPane.setText(word+" added successfully");
+				if (!word.isBlank())
+					textPane.setText(word+" added successfully");
 			}
 		});
 		insertButton.setBounds(171, 226, 96, 28);
@@ -156,6 +161,8 @@ public class Gui {
 		infoButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String text = textField.getText();
+				if (text.isBlank())
+					return;
 				try {
 					textPane.setText(obj.moreInfo(text));
 				} catch (IOException e1) {
