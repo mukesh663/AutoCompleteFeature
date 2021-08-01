@@ -25,7 +25,7 @@ public class Trie {
 	}
 	
 	protected void insert(String word) {
-		if (word == null || word.length()==0)
+		if (word == null || word.isEmpty())
 			return;
 		
 		TrieNode parent = root;
@@ -53,7 +53,7 @@ public class Trie {
     }
 	
 	protected boolean delete(String word) {
-		if (word == null || word.length()==0)
+		if (word == null || word.isEmpty())
 			return false;
 		
 		if (!find(word))
@@ -65,17 +65,13 @@ public class Trie {
         
 		for (char w : word.toCharArray()) {
 			TrieNode child = parent.children.get(w);
-			if (child == null)
-				return false;
-			if (parent.children.size() > 1 || parent.isLeaf) { // Update 'deleteBelow' and 'deleteChar'
+
+			if (parent.children.size() > 1 || parent.isLeaf) { 
                 deleteBelow = parent;
                 deleteChar = w;
             }
 			parent = child;
 		}
-		
-		if (!parent.isLeaf) 
-            return false;
         
 		if (parent.children.isEmpty()) 
             deleteBelow.children.remove(deleteChar);
@@ -84,20 +80,6 @@ public class Trie {
 		
         return true;
 	}
-	
-	public void searcher(TrieNode root, List<String> list, StringBuffer current) {
-        if (root.isLeaf) {
-            list.add(current.toString());
-        }
- 
-        if (root.children == null || root.children.isEmpty())
-            return;
- 
-        for (TrieNode child : root.children.values()) {
-            searcher(child, list, current.append(child.c));
-            current.setLength(current.length() - 1);
-        }
-    }
 	
 	public List<String> search(String prefix) {
         List<String> list = new ArrayList<>();
@@ -111,5 +93,19 @@ public class Trie {
         }
         searcher(rootNode, list, current);
         return list;
+    }
+	
+	public void searcher(TrieNode root, List<String> list, StringBuffer current) {
+        if (root.isLeaf) {
+            list.add(current.toString());
+        }
+ 
+        if (root.children == null || root.children.isEmpty())
+            return;
+ 
+        for (TrieNode child : root.children.values()) {
+            searcher(child, list, current.append(child.c));
+            current.setLength(current.length() - 1);
+        }
     }
 }
